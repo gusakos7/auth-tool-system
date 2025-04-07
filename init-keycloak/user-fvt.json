@@ -1,0 +1,23 @@
+{
+  "username": "aegis",
+  "credentials": [
+    {
+      "type": "password",
+      "value": "aegis",
+      "temporary": false
+    }
+  ],
+  "enabled": true,
+  "totp": false,
+  "emailVerified": false,
+  "disableableCredentialTypes": [],
+  "requiredActions": [],
+  "notBefore": 0,
+  "access": {
+    "manageGroupMembership": true,
+    "view": true,
+    "mapRoles": true,
+    "impersonate": true,
+    "manage": true
+  }
+}

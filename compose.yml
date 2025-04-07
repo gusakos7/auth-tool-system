@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - nextjs-keycloak
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    volumes:
+      - ./init-keycloak:/tmp/init-keycloak:ro
+    env_file:
+      - .env
+    command: start
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - proxy
+      - nextjs-keycloak
+
+  mongo:
+    image: mongo:8.0
+    volumes:
+      - mongodb_data:/data/db
+    expose:
+      - "27027"
+    env_file:
+      - .env
+    networks:
+      - nextjs-keycloak
+volumes:
+  postgres_data:
+  mongodb_data:
+
+networks:
+  proxy:
+    external: true
+  nextjs-keycloak:
+    external: true

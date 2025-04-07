@@ -1,0 +1,49 @@
+tls:
+  certificates:
+    - certFile: "/certs/localhost.crt"
+      keyFile: "/certs/localhost.key"
+      stores:
+        - default
+  stores:
+    default:
+      defaultCertificate:
+        certFile: "/certs/localhost.crt"
+        keyFile: "/certs/localhost.key"
+http:
+  routers:
+    keycloak:
+      rule: "Host(`localhost`) && PathPrefix(`/auth`)"
+      entryPoints:
+        - websecure
+      service: keycloak
+      middlewares:
+        - keycloak-strip-prefix
+      tls: {}
+    # api:
+    #   rule: "Host(`localhost`) && PathPrefix(`/api`)"
+    #   entryPoints:
+    #     - websecure
+    #   service: api
+    #   middlewares:
+    #     - api-strip-prefix
+    #   tls: {}
+
+  services:
+    keycloak:
+      loadBalancer:
+        servers:
+          - url: "http://keycloak:8080"
+    api:
+      loadBalancer:
+        servers:
+          - url: "http://api:8000"
+
+  middlewares:
+    keycloak-strip-prefix:
+      stripPrefix:
+        prefixes:
+          - "/auth"
+    api-strip-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
