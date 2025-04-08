@@ -19,14 +19,14 @@ http:
       middlewares:
         - keycloak-strip-prefix
       tls: {}
-    # api:
-    #   rule: "Host(`localhost`) && PathPrefix(`/api`)"
-    #   entryPoints:
-    #     - websecure
-    #   service: api
-    #   middlewares:
-    #     - api-strip-prefix
-    #   tls: {}
+    api:
+      rule: "Host(`localhost`) && PathPrefix(`/api`)"
+      entryPoints:
+        - websecure
+      service: api
+      middlewares:
+        - api-strip-prefix
+      tls: {}
 
   services:
     keycloak:
@@ -36,7 +36,7 @@ http:
     api:
       loadBalancer:
         servers:
-          - url: "http://api:8000"
+          - url: "http://api:7000"
 
   middlewares:
     keycloak-strip-prefix:
