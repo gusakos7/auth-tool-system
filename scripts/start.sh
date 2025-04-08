@@ -4,18 +4,26 @@
 # realpath "$0" → Gets the absolute path of the script.
 # dirname → Extracts the directory from that path.
 SCRIPTS_DIR="$(dirname "$(realpath "$0")")"
+DOCKER_DIR="$SCRIPTS_DIR/../docker"
+ROOT_DIR="$(dirname "$SCRIPTS_DIR")"
+ENV_FILE="$ROOT_DIR/.env"
 
 # Ensure the scripts directory exists
 if [ ! -d "$SCRIPTS_DIR" ]; then
   echo "❌ Directory '$SCRIPTS_DIR' does not exist."
   exit 1
 fi
+# Ensure the docker directory exists
+if [ ! -d "$DOCKER_DIR" ]; then
+  echo "❌ Directory '$DOCKER_DIR' does not exist."
+  exit 1
+fi
 
 # Parse the command-line argument for environment mode (dev or prod)
 if [ "$1" == "dev" ]; then
-    COMPOSE_FILES="-f compose.traefik.yml -f compose.yml -f compose.api-dev.yml"
+    COMPOSE_FILES="-f $DOCKER_DIR/compose.traefik.yml -f $DOCKER_DIR/compose.yml -f $DOCKER_DIR/compose.api-dev.yml"
 elif [ "$1" == "prod" ]; then
-    COMPOSE_FILES="-f compose.traefik.yml -f compose.yml"
+    COMPOSE_FILES="-f $DOCKER_DIR/compose.traefik.yml -f $DOCKER_DIR/compose.yml"
 else
     echo "❌ Invalid environment specified. Usage: ./start.sh {dev|prod} [--build]"
     exit 1
@@ -36,10 +44,10 @@ fi
 # " $@ ": This is the string representation of all the script arguments, with spaces before and after ($@), to ensure that matching works even if there are multiple arguments.
 # =~: This is a regular expression matching operator in bash. It checks if the string on the left (in this case, "$@" containing the arguments) matches the pattern on the right (in this case, " --build ").
 if [[ " $@ " =~ " --build " ]]; then
-    CMD="$DOCKER_CMD $COMPOSE_FILES up -d --build"
+    CMD="$DOCKER_CMD --env-file $ENV_FILE $COMPOSE_FILES up -d --build"
     echo "🚀 Starting and building Docker containers with command: $CMD"
 else
-    CMD="$DOCKER_CMD $COMPOSE_FILES up -d"
+    CMD="$DOCKER_CMD --env-file $ENV_FILE $COMPOSE_FILES up -d"
     echo "🚀 Starting Docker containers with command: $CMD"
 fi
 

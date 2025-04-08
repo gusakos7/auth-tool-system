@@ -1,0 +1,20 @@
+services:
+  api:
+    build:
+      context: "/home/raftkon/projects/express-auth/backend/"
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - /home/raftkon/projects/express-auth/backend/:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run dev
+    networks:
+      - nextjs-keycloak
+      - proxy
+
+networks:
+  proxy:
+    external: true
+  nextjs-keycloak:
+    external: true

@@ -4,6 +4,9 @@
 # realpath "$0" → Gets the absolute path of the script.
 # dirname → Extracts the directory from that path.
 SCRIPTS_DIR="$(dirname "$(realpath "$0")")"
+DOCKER_DIR="$SCRIPTS_DIR/../docker"
+ROOT_DIR="$(dirname "$SCRIPTS_DIR")"
+ENV_FILE="$ROOT_DIR/.env"
 
 # Ensure the scripts directory exists
 if [ ! -d "$SCRIPTS_DIR" ]; then
@@ -13,9 +16,9 @@ fi
 
 # Parse the command-line argument for environment mode (dev or prod)
 if [ "$1" == "dev" ]; then
-    COMPOSE_FILES="-f compose.traefik.yml -f compose.yml -f compose.api-dev.yml"
+    COMPOSE_FILES="-f $DOCKER_DIR/compose.traefik.yml -f $DOCKER_DIR/compose.yml -f $DOCKER_DIR/compose.api-dev.yml"
 elif [ "$1" == "prod" ]; then
-    COMPOSE_FILES="-f compose.traefik.yml -f compose.yml"
+    COMPOSE_FILES="-f $DOCKER_DIR/compose.traefik.yml -f $DOCKER_DIR/compose.yml"
 else
     echo "❌ Invalid environment specified. Usage: ./stop.sh {dev|prod} [--remove-volumes]"
     exit 1
@@ -33,10 +36,10 @@ fi
 
 # Check if '--remove-volumes' argument is passed
 if [[ " $@ " =~ " --remove-volumes " ]]; then
-    CMD="$DOCKER_CMD $COMPOSE_FILES down -v"
+    CMD="$DOCKER_CMD --env-file $ENV_FILE $COMPOSE_FILES down -v"
     echo "🚀 Stopping and removing Docker containers and volumes with command: $CMD"
 else
-    CMD="$DOCKER_CMD $COMPOSE_FILES down"
+    CMD="$DOCKER_CMD --env-file $ENV_FILE $COMPOSE_FILES down"
     echo "🚀 Stopping Docker containers with command: $CMD"
 fi
 

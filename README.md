@@ -1,6 +1,6 @@
 # Express-Auth
 
-This project uses Docker to manage and run a set of containers for both development and production environments. The repository provides an easy-to-use script system to manage Docker containers, including starting, stopping, building images, deleting volumes, and viewing logs.
+This project uses Docker Compose to manage and run multiple services, with configurations for both development and production environments. The `test.sh` script allows you to easily start, stop, and view logs for the Docker containers, with flexibility to customize the environment and behavior through command-line options.
 
 ## Prerequisites
 
@@ -14,119 +14,157 @@ Before running the project, make sure you have the following installed:
 ## Project Structure
 
 ```bash
-/
-├── run.sh             # Main script for interacting with the project
-└── scripts/
-    ├── start.sh       # Starts the containers (with an option to build)
-    ├── stop.sh        # Stops the containers (with an option to delete volumes)
-    ├── logs.sh        # Views the logs of the containers
-    └── compose.*.yml  # Docker Compose files for different environments (e.g., dev and prod)
+.
+├── certs/
+├── conf/
+├── docker/
+├── scripts/
+├── .env
+└── run.sh
 ```
 
-## Available Actions
+- `docker/`: Contains the Docker Compose configuration files for different environments.
+  - `compose.traefik.yml`: Configuration for Traefik reverse proxy.
+  - `compose.yml`: The main Compose configuration for your application.
+  - `compose.api-dev.yml`: Additional configuration for development mode (API services, etc.).
+    `.env`: The environment file containing configuration variables for the containers.
+    `run.sh`: The script used to manage Docker containers (start, stop, logs) and configure them based on the environment.
+    `scripts/`: A folder that might contain additional utility scripts.
 
-You can use the `run.sh` script to interact with the Docker containers. The available actions are:
+<br>
 
-1. **Start Docker containers**: Start containers in either development or production mode.
-2. **Stop Docker containers**: Stop containers and optionally delete volumes.
-3. **View Docker container logs**: View logs from the containers with options to follow the logs or specify the number of lines to show.
-4. **Exit**: Exit the script.
+## How to use `run.sh`
 
-## Running the Project
+The `run.sh` script is a simple command-line interface to manage your Docker containers. You can perform actions like starting, stopping, or viewing logs from your services. The script is interactive, allowing you to customize the environment, build options, and other configurations easily.
 
-### 1. Start the Docker Containers
+### Basic Commands
 
-To start the containers, run:
+#### Start the Project
+
+To start the project in development (`dev`) mode or production (`prod`) mode, use the following options:
 
 ```bash
-./run.sh
+./run.sh -e <environment> -b -s
 ```
 
-The script will prompt you to choose between **development (d)** or **production (p)** mode. It will also ask if you want to build the images or just start the containers without rebuilding them.
-
-- **Dev Mode**: Choose `d` or `dev` for development mode.
-- **Prod Mode**: Choose `p` or `prod` for production mode.
-- **Build Option**: Choose `y` or `yes` to build the images before starting the containers, or `n` or `no` to skip the build.
-
-### 2. Stop the Docker Containers
-
-To stop the containers, run:
+- `-e`: Specifies the environment (`dev` or `prod`). Default is `prod`.
+- `-b`: Builds the images before starting the containers.
+- `-s`: Starts the containers.
+  Example:
 
 ```bash
-./run.sh
+./run.sh -e dev -b -s  # Start in dev mode and build images
+./run.sh -e prod -s    # Start in prod mode without building
 ```
 
-The script will prompt you to choose between **development (d)** or **production (p)** mode. It will also ask if you want to delete volumes during the stop process.
+#### Stop the Project
 
-- Dev Mode: Choose `d` or `dev` for development mode.
-- Prod Mode: Choose `p` or `prod` for production mode.
-- Delete Volumes: Choose `y` or `yes` to delete volumes when stopping the containers, or `n` or `no` to keep them.
-
-### 3. View Docker Container Logs
-
-To view the logs from the containers, run:
+To stop the project, you can use:
 
 ```bash
-./run.sh
+./run.sh -e <environment> -t
 ```
 
-The script will prompt you to choose between **development (d)** or **production (p)** mode. It will then ask if you want to follow the logs (show logs in real-time) or specify the number of lines to display.
+- `-e`: Specifies the environment (`dev` or `prod`). Default is `prod`.
+- `-t`: Stops the containers.
 
-- Dev Mode: Choose `d` or `dev` for development mode.
-- Prod Mode: Choose `p` or `prod` for production mode.
-- Follow Logs: Choose `y` or `yes` to follow the logs, or `n` or `no` to show a specific number of lines.
-- Specify Lines: If you choose not to follow logs, you will be prompted to specify the number of lines to display (defaults to 50).
+To delete volumes when stopping, add the -v flag:
 
-### 4. Exit the Script
+```bash
+./run.sh -e dev -t -v  # Stop in dev mode and delete volumes
+```
 
-If you are done, you can exit the script by choosing option 4 from the menu.
+#### Show Logs
 
-## How the Scripts Work
+To view the logs of your running containers:
 
-The project uses the following scripts to manage Docker containers:
+```bash
+./run.sh -e <environment> -l
+```
 
-- start.sh: This script is used to start the Docker containers. It accepts the environment (`dev` or `prod`) and an optional `--build` argument to rebuild the images before starting the containers.
+- `-e`: Specifies the environment (`dev` or `prod`). Default is `prod`.
+- `-l`: Displays logs.
 
-  Example:
+Example:
 
-  ```bash
-  ./scripts/start.sh dev --build
-  ```
+```bash
+./run.sh -l  # Show logs for the default environment (prod)
+```
 
-- stop.sh: This script stops the Docker containers. It also accepts an optional `--volumes` argument to delete volumes when stopping the containers.
+#### Use a Custom .env File
 
-  Example:
+You can specify a custom .env file to be used with Docker Compose using the --env-file flag:
 
-  ```bash
-  ./scripts/stop.sh prod --volumes
-  ```
+```bash
+./run.sh --env-file <path-to-env-file> -s
+```
 
-- logs.sh: This script displays the logs from the Docker containers. You can specify whether to follow the logs (`-f` flag) or specify the number of lines to display.
-  Example:
+- `--env-file`: The path to your custom `.env` file.
 
-  ```bash
-  ./scripts/logs.sh dev -f
-  ```
+Example:
 
-## Environment Configuration
+```bash
+./run.sh --env-file .env.dev -e dev -s  # Start using a custom .env file
+```
 
-The project uses multiple Docker Compose files to manage different environments. The `compose.dev.yml` file is used for the development environment, while the `compose.prod.yml` file is used for production.
+<br>
 
-The main compose.yml file contains the common configuration shared between the two environments.
+## Options Summary
 
-### Adding New Compose Files
+| Option          | Description                                                |
+| --------------- | ---------------------------------------------------------- |
+| `-e, --env`     | Set the environment (either dev or prod). Default is prod. |
+| `-b, --build`   | Build the images before starting the containers.           |
+| `-s, --start`   | Start the containers.                                      |
+| `-t, --stop`    | Stop the containers.                                       |
+| `-v, --volumes` | Delete volumes when stopping the containers.               |
+| `-l, --logs`    | Show the logs of the running containers.                   |
+| `--env-file`    | Specify a custom .env file.                                |
 
-You can add additional `compose.<env>.yml` files for other environments (e.g., `staging`, `t`es`t`ing) and then modify the scripts accordingly if needed.
+<br>
+
+## Example Usage
+
+1. **Start the project in `dev` mode with build**:
+
+   ```bash
+   ./run.sh -e dev -b -s
+   ```
+
+2. **Start the project in `prod` mode without build**:
+   ```bash
+   ./run.sh -e prod -s
+   ```
+3. **Stop the project and delete volumes**:
+
+   ```bash
+   ./run.sh -e dev -t -v
+   ```
+
+4. **Show the logs**:
+   ```bash
+   ./run.sh -l
+   ```
+5. Start the project using a custom .env file:
+
+   ```bash
+   ./run.sh --env-file .env.dev -e dev -s
+   ```
+
+<br>
 
 ## Troubleshooting
 
-- If you encounter an error stating that `docker compose` is not found, make sure you have Docker Compose installed and that it's available in your `PATH`. For Docker Compose v2, you can use `docker compose` instead of `docker-compose`.
-- If the containers fail to start, check the logs for more details about what went wrong. Use the `logs.sh` script to view container logs for troubleshooting.
+- **Error: `.env` file not found**
 
-## Contributing
+  If you encounter an error about the `.env` file not being found, ensure that the file exists in the root directory. If you're using a custom `.env` file, specify it using the `--env-file` option.
 
-Feel free to fork the repository and submit pull requests. Ensure to follow the contribution guidelines and best practices for Docker and Bash scripting.
+- **Docker permissions**
 
-### Additional Notes
+  Ensure that your user has permission to run Docker commands without sudo. If not, add your user to the Docker group:
 
-This `README.md` provides an overview of how to set up and manage the project using the scripts. The script system is flexible, allowing you to easily extend and customize it based on your specific needs.
+  ```bash
+  sudo usermod -aG docker $(whoami)
+  ```
+
+  After running this command, log out and back in for the changes to take effect.

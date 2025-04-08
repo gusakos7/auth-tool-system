@@ -3,12 +3,14 @@
 # "$0" → Refers to the script itself.
 # realpath "$0" → Gets the absolute path of the script.
 # dirname → Extracts the directory from that path.
-SCRIPTS_DIR="$(dirname "$(realpath "$0")")/scripts"  # Assuming the scripts are inside a 'scripts' folder
-
+ROOT_DIR="$(dirname "$(realpath "$0")")"  # Assuming the scripts are inside a 'scripts' folder
+SCRIPTS_DIR="$ROOT_DIR/scripts"
+ENV_FILE="$ROOT_DIR/.env"
+echo "ROOT_DIR: $ROOT_DIR"
 # Ensure the scripts directory exists
 if [ ! -d "$SCRIPTS_DIR" ]; then
-  echo "❌ Directory '$SCRIPTS_DIR' does not exist."
-  exit 1
+    echo "❌ Directory '$SCRIPTS_DIR' does not exist."
+    exit 1
 fi
 
 # List available actions

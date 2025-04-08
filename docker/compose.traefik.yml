@@ -2,8 +2,7 @@ services:
   reverse-proxy:
     image: traefik:v3.3
     restart: unless-stopped
-    env_file:
-      - .env
+    user: "${UID:-1000}:${GID:-1000}"
     security_opt:
       - no-new-privileges:true
     ports:
@@ -11,8 +10,8 @@ services:
       - "$TRAEFIK_HTTPS_PORT:443"
       - "$GATEWAY_PORT:8080"
     volumes:
-      - ./certs:/certs:ro
-      - ./conf/traefik:/etc/traefik/
+      - /home/raftkon/projects/express-auth/system/certs:/certs:ro
+      - /home/raftkon/projects/express-auth/system/conf/traefik:/etc/traefik/
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - proxy
