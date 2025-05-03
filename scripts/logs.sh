@@ -35,7 +35,7 @@ else
 fi
 
 # Default logs command
-CMD="$DOCKER_CMD --env-file $ENV_FILE $COMPOSE_FILES logs"
+CMD="$DOCKER_CMD --env-file $ENV_FILE $COMPOSE_FILES logs -f"
 
 # If '--lines N' is passed, fetch the last N lines of logs
 LINES=0

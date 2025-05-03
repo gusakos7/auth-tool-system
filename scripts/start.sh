@@ -10,13 +10,13 @@ ENV_FILE="$ROOT_DIR/.env"
 
 # Ensure the scripts directory exists
 if [ ! -d "$SCRIPTS_DIR" ]; then
-  echo "❌ Directory '$SCRIPTS_DIR' does not exist."
-  exit 1
+    echo "❌ Directory '$SCRIPTS_DIR' does not exist."
+    exit 1
 fi
 # Ensure the docker directory exists
 if [ ! -d "$DOCKER_DIR" ]; then
-  echo "❌ Directory '$DOCKER_DIR' does not exist."
-  exit 1
+    echo "❌ Directory '$DOCKER_DIR' does not exist."
+    exit 1
 fi
 
 # Parse the command-line argument for environment mode (dev or prod)

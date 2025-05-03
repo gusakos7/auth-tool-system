@@ -3,6 +3,8 @@ services:
     build:
       context: "/home/raftkon/projects/express-auth/backend/"
     user: "${UID:-1000}:${GID:-1000}"
+    env_file:
+      - ../.env
     environment:
       - NODE_ENV=development
     volumes:

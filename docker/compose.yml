@@ -3,27 +3,45 @@ services:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ../.env
     networks:
       - nextjs-keycloak
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     user: "${UID:-1000}:${GID:-1000}"
-    # volumes:
-    #   - ./init-keycloak:/tmp/init-keycloak:ro
-    command: start
+    volumes:
+      - ../init-keycloak:/opt/keycloak/init-keycloak:ro
+    env_file:
+      - ../.env
+    command: ["start"]
     restart: always
     depends_on:
       - postgres
     networks:
       - proxy
       - nextjs-keycloak
+    entrypoint: ["/opt/keycloak/init-keycloak/start_up.sh"]
 
-  mongo:
+  mongodb:
     image: mongo:8.0
     volumes:
       - mongodb_data:/data/db
+      - ../init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    env_file:
+      - ../.env
     expose:
       - "27027"
+    networks:
+      - nextjs-keycloak
+
+  keycloak-setup:
+    image: curlimages/curl:8.13.0
+    profiles:
+      - setup
+    volumes:
+      - ../init-keycloak:/init-keycloak
+    entrypoint: ["sh", "/init-keycloak/importer.sh"]
     networks:
       - nextjs-keycloak
 volumes:

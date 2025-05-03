@@ -50,7 +50,7 @@ while [[ "$#" -gt 0 ]]; do
             shift
             ;;
         -l|--logs)
-            SHOW_LOGS=true
+            ACTION="logs"
             shift
             ;;
         -v|--volumes)
